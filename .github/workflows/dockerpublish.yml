@@ -15,6 +15,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        
+      - name: Register QMEU with the local kernel to build ARM images
+        run: docker run --rm --privileged hypriot/qemu-register
 
       - name: Build image
         run: docker build . --file Dockerfile --tag image
