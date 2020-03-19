@@ -1,0 +1,8 @@
+github.com/bhoriuchi/go-bunyan v0.0.0-20170831222709-8815b5fdce8c h1:BE3+9bR0SyBzMxfRC757ZuL6y2gUPLTIdKiGaIN/AnM=
+github.com/bhoriuchi/go-bunyan v0.0.0-20170831222709-8815b5fdce8c/go.mod h1:IoEubsg3+MXkMzCfB1WycgpBKSspnHj+N/AodQqb3lE=
+github.com/gorilla/context v1.1.1 h1:AWwleXJkX/nhcU9bZSnZoi3h/qGYqQAGhq6zZe/aQW8=
+github.com/gorilla/context v1.1.1/go.mod h1:kBGZzfjB9CEq2AlWe17Uuf7NDRt0dE0s8S51q0aT7Yg=
+github.com/gorilla/handlers v1.3.0 h1:tsg9qP3mjt1h4Roxp+M1paRjrVBfPSOpBuVclh6YluI=
+github.com/gorilla/handlers v1.3.0/go.mod h1:Qkdc/uu4tH4g6mTK6auzZ766c4CA0Ng8+o/OAirnOIQ=
+github.com/gorilla/mux v1.6.2-0.20180314163126-4dbd923b0c9e h1:P4HZPfD5owD3GJuOQT5fTNIYzhWAYKz7nwlteyC88jQ=
+github.com/gorilla/mux v1.6.2-0.20180314163126-4dbd923b0c9e/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
