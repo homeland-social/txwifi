@@ -23,4 +23,5 @@ dev_run:
                    -w /go/src/github.com/txn2/txwifi \
                    --name=$(NAME) $(IMAGE):latest
 
-
+gomod:
+	GOPROXY="" go mod vendor && go mod tidy
