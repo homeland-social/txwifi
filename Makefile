@@ -1,5 +1,5 @@
-IMAGE    ?= cjimti/iotwifi
-NAME     ?= txwifi
+IMAGE    ?= kinokochat/txwifi
+NAME     ?= kinokochat
 VERSION  ?= 1.0.4
 
 all: build push
@@ -7,20 +7,18 @@ all: build push
 dev: dev_build dev_run
 
 build:
-	docker build -t $(IMAGE):latest .
-	docker build -t $(IMAGE):arm32v6-$(VERSION) .
+	docker build -t $(IMAGE):latest -t $(IMAGE):arm32v7-$(VERSION) .
 
 push:
-	docker build -t $(IMAGE):latest .
-	docker build -t $(IMAGE):arm32v6-$(VERSION) .
+	docker push $(IMAGE):arm32v7-$(VERSION)
 
 dev_build:
 	docker build -t $(IMAGE) ./dev/
 
 dev_run:
 	sudo docker run --rm -it --privileged --network=host \
-                   -v $(CURDIR):/go/src/github.com/txn2/txwifi \
-                   -w /go/src/github.com/txn2/txwifi \
+                   -v $(CURDIR):/go/src/github.com/kinokochat/txwifi \
+                   -w /go/src/github.com/kinokochat/txwifi \
                    --name=$(NAME) $(IMAGE):latest
 
 gomod:
