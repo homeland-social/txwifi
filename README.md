@@ -1,4 +1,4 @@
-**Update - 20180601**: Any future development will happen on this new fork. Hoping add stability as well as new SOCs. If you are interesrted in joining the [txn2](https://txn2.com) team please email human@txn2.com.
+**Update - 20180601**: Any future development will happen on this new fork. Hoping add stability as well as new SOCs. If you are interesrted in joining the [kinokochat](https://kinokochat.com) team please email human@kinokochat.com.
 
 **Update**: Tested and functioning on well on the [Raspberry Pi 3 B+](https://amzn.to/2jfXhCA) and [Raspberry Pi 3 B](https://amzn.to/2Kq9Doa). Looking to support additional SOCs in upcoming versions. (Disclosure: the Pi links to Amazon are affiliate links, why not?)
 
@@ -10,8 +10,8 @@
 
 # IOT Wifi (Raspberry Pi AP + Client)
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/txn2/txwifi)](https://goreportcard.com/report/github.com/txn2/txwifi)
-[![GoDoc](https://godoc.org/github.com/txn2/txwifi/iotwifi?status.svg)](https://godoc.org/github.com/txn2/txwifi/iotwifi)
+[![Go Report Card](https://goreportcard.com/badge/github.com/kinokochat/txwifi)](https://goreportcard.com/report/github.com/kinokochat/txwifi)
+[![GoDoc](https://godoc.org/github.com/kinokochat/txwifi/iotwifi?status.svg)](https://godoc.org/github.com/kinokochat/txwifi/iotwifi)
 [![Docker Container Image Size](https://shields.beevelop.com/docker/image/image-size/cjimti/iotwifi/latest.svg)](https://hub.docker.com/r/cjimti/iotwifi/)
 [![Docker Container Layers](https://shields.beevelop.com/docker/image/layers/cjimti/iotwifi/latest.svg)](https://hub.docker.com/r/cjimti/iotwifi/)
 [![Docker Container Pulls](https://img.shields.io/docker/pulls/cjimti/iotwifi.svg)](https://hub.docker.com/r/cjimti/iotwifi/)
@@ -131,7 +131,7 @@ started quickly I'll show you how to use a pre-built Docker Image. At
 only 16MB this little image contains everything you need. The image
 is based on [Alpine Linux] and contains [hostapd], [wpa_supplicant] and
 [dnsmasq], along with a compiled wifi management utility written in go,
-the source is found in this repository: https://github.com/txn2/txwifi.
+the source is found in this repository: https://github.com/kinokochat/txwifi.
 
 ```bash
 # Pull the IOT Wifi Docker Image
@@ -152,7 +152,7 @@ Use the default configuration file and location for testing:
 ```bash
 # Download the default configuration file
 
-$ wget https://raw.githubusercontent.com/txn2/txwifi/master/cfg/wificfg.json
+$ wget https://raw.githubusercontent.com/kinokochat/txwifi/master/cfg/wificfg.json
 
 ```
 

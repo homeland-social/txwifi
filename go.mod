@@ -1,4 +1,4 @@
-module github.com/txn2/txwifi
+module github.com/kinokochat/txwifi
 
 go 1.13
 
