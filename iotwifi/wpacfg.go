@@ -57,7 +57,7 @@ func NewWpaCfg(log bunyan.Logger, cfgLocation string) *WpaCfg {
 }
 
 // StartAP starts AP mode.
-func (wpa *WpaCfg) StartAP() {
+func (wpa *WpaCfg) StartAP() (*exec.Cmd) {
 	wpa.Log.Info("Starting Hostapd.")
 
 	command := &Command{
@@ -93,6 +93,8 @@ func (wpa *WpaCfg) StartAP() {
 ssid=` + wpa.WpaCfg.HostApdCfg.Ssid + `
 hw_mode=g
 channel=` + wpa.WpaCfg.HostApdCfg.Channel + `
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
@@ -114,15 +116,41 @@ rsn_pairwise=CCMP`
 			wpa.Log.Info("Hostapd DISABLED")
 			//cmd.Process.Kill()
 			//cmd.Wait()
-
-			return
-
+			return cmd
 		}
 		if strings.Contains(out, "uap0: AP-ENABLED") {
 			wpa.Log.Info("Hostapd ENABLED")
-			return
+			return cmd
 		}
 	}
+}
+
+// Status returns the AP status.
+func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
+	cfgMap := make(map[string]interface{}, 0)
+
+	stateOut, err := exec.Command("hostapd_cli", "-i", "uap0", "status").Output()
+	if err != nil {
+		wpa.Log.Fatal("Got error checking state: %s", err.Error())
+		return cfgMap, err
+	}
+
+	cfgMap = cfgMapper(stateOut)
+
+	clientsOut, err := exec.Command("hostapd_cli", "-i", "uap0", "list_sta").Output()
+	if err != nil {
+		wpa.Log.Fatal("Got error checking clients: %s", err.Error())
+		return cfgMap, err
+	}
+
+	clients := []string{};
+	lines := bytes.Split(clientsOut, []byte("\n"))
+	for _, line := range lines {
+		clients = append(clients, string(line))
+	}
+	cfgMap["clients"] = clients
+
+	return cfgMap, nil
 }
 
 // ConfiguredNetworks returns a list of configured wifi networks.
@@ -219,8 +247,8 @@ func (wpa *WpaCfg) ConnectNetwork(creds WpaCredentials) (WpaConnection, error) {
 }
 
 // Status returns the WPA wireless status.
-func (wpa *WpaCfg) Status() (map[string]string, error) {
-	cfgMap := make(map[string]string, 0)
+func (wpa *WpaCfg) Status() (map[string]interface{}, error) {
+	cfgMap := make(map[string]interface{}, 0)
 
 	stateOut, err := exec.Command("wpa_cli", "-i", "wlan0", "status").Output()
 	if err != nil {
@@ -233,9 +261,9 @@ func (wpa *WpaCfg) Status() (map[string]string, error) {
 	return cfgMap, nil
 }
 
-// cfgMapper takes a byte array and splits by \n and then by = and puts it all in a map.
-func cfgMapper(data []byte) map[string]string {
-	cfgMap := make(map[string]string, 0)
+// cfgMapper handle wpa_cli and hostapd_cli results, takes a byte array and splits by \n and then by = and puts it all in a map.
+func cfgMapper(data []byte) map[string]interface{} {
+	cfgMap := make(map[string]interface{}, 0)
 
 	lines := bytes.Split(data, []byte("\n"))
 

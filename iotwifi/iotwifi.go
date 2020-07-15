@@ -106,17 +106,27 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	})
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
-	wpacfg.StartAP()
+	command.Runner.Commands["hostapd"] = wpacfg.StartAP()
 
 	time.Sleep(10 * time.Second)
 
+	// Start supplicant and attempt to connect
 	command.StartWpaSupplicant()
 
-	// Scan
+	// Initial scan
 	time.Sleep(5 * time.Second)
 	wpacfg.ScanNetworks()
 
 	command.StartDnsmasq()
+
+	/* Check if we connected, start soft-ap if not
+	time.Sleep(30 * time.Second)
+	if status, ok := wpacfg.Status(); ok == nil && status["wpa_state"] != "COMPLETED" {
+		log.Info("No connection detected - starting AP...")
+		time.Sleep(10 * time.Second)
+		command.StartDnsmasq()
+	}*/
+
 
 	// TODO: check to see if we are stuck in a scanning state before
 	// if in a scanning state set a timeout before resetting
@@ -124,6 +134,21 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 		for {
 			wpacfg.ScanNetworks()
 			time.Sleep(30 * time.Second)
+		}
+	}()
+
+	// disable soft-ap once network connection occurs
+	go func() {
+		for {
+			time.Sleep(30 * time.Second)
+			if status, ok := wpacfg.Status(); ok == nil && status["wpa_state"] == "COMPLETED" {
+				log.Info("Connection detected - stopping AP...")
+				time.Sleep(10 * time.Second)
+				command.Runner.KillCmd("dnsmasq")
+				command.Runner.KillCmd("hostapd")
+				command.RemoveApInterface()
+				break
+			}
 		}
 	}()
 
@@ -200,5 +225,16 @@ func (c *CmdRunner) ProcessCmd(id string, cmd *exec.Cmd) {
 
 	if err != nil {
 		panic(err)
+	}
+}
+
+// KillCmd kills an internal command.
+func (c *CmdRunner) KillCmd(id string) {
+	c.Log.Debug("KillCmd got %s", id)
+
+	if cmd, ok := c.Commands[id]; ok {
+		if err := cmd.Process.Kill(); err != nil {
+			panic(err)
+		}
 	}
 }
