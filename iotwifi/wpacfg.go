@@ -129,7 +129,7 @@ rsn_pairwise=CCMP`
 func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
 	cfgMap := make(map[string]interface{}, 0)
 
-	stateOut, err := exec.Command("hostapd_cli", "-i", "uap0", "status").Output()
+	stateOut, err := exec.Command("hostapd_cli", "-i", "uap0", "get_config").Output()
 	if err != nil {
 		wpa.Log.Fatal("Got error checking state: %s", err.Error())
 		return cfgMap, err
@@ -146,7 +146,9 @@ func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
 	clients := []string{};
 	lines := bytes.Split(clientsOut, []byte("\n"))
 	for _, line := range lines {
-		clients = append(clients, string(line))
+		if len(line) > 1 {
+			clients = append(clients, string(line))
+		}
 	}
 	cfgMap["clients"] = clients
 
