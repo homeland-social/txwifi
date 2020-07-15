@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/exec"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/bhoriuchi/go-bunyan/bunyan"
@@ -75,6 +76,15 @@ func loadCfg(cfgLocation string) (*SetupCfg, error) {
 	return v, err
 }
 
+// Check if the ethernet interface is active
+func EthActive() bool {
+			ethOut, err := exec.Command("ethtool", "eth0").Output()
+			if err != nil {
+				panic(err)
+			}
+			return strings.Contains(string(ethOut), "Link detected: yes")
+		}
+
 // RunWifi starts AP and Station modes.
 func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 
@@ -121,8 +131,16 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	go func() {
 		for {
 			time.Sleep(30 * time.Second)
+
+			if EthActive() {
+				log.Info("Eth Connection detected - stopping AP...")
+				time.Sleep(5 * time.Second)
+				command.DisableAp()
+				break
+			}
+
 			if status, ok := wpacfg.Status(); ok == nil && status["wpa_state"] == "COMPLETED" {
-				log.Info("Connection detected - stopping AP...")
+				log.Info("WiFi Connection detected - stopping AP...")
 				time.Sleep(5 * time.Second)
 				command.DisableAp()
 				break

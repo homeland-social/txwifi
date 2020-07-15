@@ -11,7 +11,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/wifi-server /go/src/github.com/
 FROM arm32v7/alpine:3.11
 
 RUN apk update
-RUN apk add bridge hostapd wireless-tools wpa_supplicant dnsmasq iw
+RUN apk add bridge hostapd wireless-tools wpa_supplicant dnsmasq iw ethtool
 
 RUN mkdir -p /etc/wpa_supplicant/
 COPY ./dev/configs/wpa_supplicant.conf /etc/wpa_supplicant/wpa_supplicant.conf
