@@ -113,8 +113,10 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	// Start supplicant and attempt to connect
 	command.StartWpaSupplicant()
 
-	// Start DNSmasq
+	// Do a single scan
 	time.Sleep(5 * time.Second)
+	wpacfg.ScanNetworks()
+
 	command.StartDnsmasq()
 
 	// monitor for a future connection - shut down AP when it occurs
