@@ -57,7 +57,7 @@ func NewWpaCfg(log bunyan.Logger, cfgLocation string) *WpaCfg {
 }
 
 // StartAP starts AP mode.
-func (wpa *WpaCfg) StartAP() (*exec.Cmd) {
+func (wpa *WpaCfg) StartAP() {
 	wpa.Log.Info("Starting Hostapd.")
 
 	command := &Command{
@@ -116,11 +116,11 @@ rsn_pairwise=CCMP`
 			wpa.Log.Info("Hostapd DISABLED")
 			//cmd.Process.Kill()
 			//cmd.Wait()
-			return cmd
+			return
 		}
 		if strings.Contains(out, "uap0: AP-ENABLED") {
 			wpa.Log.Info("Hostapd ENABLED")
-			return cmd
+			return
 		}
 	}
 }
@@ -138,7 +138,9 @@ func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
 
 	// Remove the indexing associated with ssid, bssid, and bss
 	stateOut = bytes.ReplaceAll(stateOut, []byte("[0]"), []byte(""))
-	cfgMap = cfgMapper(stateOut)
+
+	// Parse and convert to interface map
+	for key, val := range cfgMapper(stateOut){cfgMap[key] = val}
 
 	// get the list of connected clients
 	clientsOut, err := exec.Command("hostapd_cli", "-i", "uap0", "list_sta").Output()
@@ -148,7 +150,7 @@ func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
 	}
 
 	clients := []string{};
-	lines := bytes.Split(clientsOut, []byte("\n"))
+	lines := strings.Split(string(clientsOut), "\n")
 	for _, line := range lines {
 		if len(line) > 1 {
 			clients = append(clients, string(line))
@@ -253,8 +255,8 @@ func (wpa *WpaCfg) ConnectNetwork(creds WpaCredentials) (WpaConnection, error) {
 }
 
 // Status returns the WPA wireless status.
-func (wpa *WpaCfg) Status() (map[string]interface{}, error) {
-	cfgMap := make(map[string]interface{}, 0)
+func (wpa *WpaCfg) Status() (map[string]string, error) {
+	cfgMap := make(map[string]string, 0)
 
 	stateOut, err := exec.Command("wpa_cli", "-i", "wlan0", "status").Output()
 	if err != nil {
@@ -268,8 +270,8 @@ func (wpa *WpaCfg) Status() (map[string]interface{}, error) {
 }
 
 // cfgMapper handle wpa_cli and hostapd_cli results, takes a byte array and splits by \n and then by = and puts it all in a map.
-func cfgMapper(data []byte) map[string]interface{} {
-	cfgMap := make(map[string]interface{}, 0)
+func cfgMapper(data []byte) map[string]string {
+	cfgMap := make(map[string]string, 0)
 
 	lines := bytes.Split(data, []byte("\n"))
 

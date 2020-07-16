@@ -123,7 +123,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	go func() {
 		for {
 			time.Sleep(30 * time.Second)
-			if status, ok := wpacfg.Status(); ok == nil && status["wpa_state"] == "COMPLETED" {
+			if status, err := wpacfg.Status(); err == nil && status["wpa_state"] == "COMPLETED" {
 				log.Info("Connection detected - stopping AP...")
 				time.Sleep(5 * time.Second)
 				command.DisableAp()
