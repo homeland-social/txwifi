@@ -90,7 +90,19 @@ func main() {
 		w.Write(ret)
 	}
 
-	// handle /status POSTs json in the form of iotwifi.WpaConnect
+	// handle /apstatus GETs
+	apStatusHandler := func(w http.ResponseWriter, r *http.Request) {
+
+		status, err := wpacfg.APStatus()
+		if err != nil {
+			blog.Error(err.Error())
+			return
+		}
+
+		apiPayloadReturn(w, "status", status)
+	}
+
+	// handle /status GETs
 	statusHandler := func(w http.ResponseWriter, r *http.Request) {
 
 		status, err := wpacfg.Status()
@@ -192,6 +204,7 @@ func main() {
 	r.Use(logHandler)
 
 	// set app routes
+	r.HandleFunc("/ap", apStatusHandler)
 	r.HandleFunc("/status", statusHandler)
 	r.HandleFunc("/connect", connectHandler).Methods("POST")
 	r.HandleFunc("/scan", scanHandler)

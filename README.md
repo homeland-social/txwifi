@@ -1,8 +1,10 @@
+**Update - 20200715**: Tested and functioning on well on the [Raspberry Pi 4].
+
 **Update - 20180601**: Any future development will happen on this new fork. Hoping add stability as well as new SOCs. If you are interesrted in joining the [kinokochat](https://kinokochat.com) team please email human@kinokochat.com.
 
 **Update**: Tested and functioning on well on the [Raspberry Pi 3 B+](https://amzn.to/2jfXhCA) and [Raspberry Pi 3 B](https://amzn.to/2Kq9Doa). Looking to support additional SOCs in upcoming versions. (Disclosure: the Pi links to Amazon are affiliate links, why not?)
 
-**NOTICE**: This project is intended to aid in developing "configure wifi over wifi" solutions for IOT projects using the Raspberry Pi. The main use case for this project is to reproduce functionality common to devices like Nest or Echo, where the user turns on the device, connects to it and configures it for wifi. I have over 800 devices running this software in production and all have had their wifi configured using it. 
+**NOTICE**: This project is intended to aid in developing "configure wifi over wifi" solutions for IOT projects using the Raspberry Pi. The main use case for this project is to reproduce functionality common to devices like Nest or Echo, where the user turns on the device, connects to it and configures it for wifi. I have over 800 devices running this software in production and all have had their wifi configured using it.
 
 **This is not a captive portal project. While I have personaly used it for this, it requires additional networking and can be unstable. I don't support this use and so your millage may vary.**
 
@@ -190,7 +192,7 @@ the Raspberry Pi. We will also need to mount the configuration file.
 
 We will run it in the foreground to observe the startup process. If you want
 it to run the background, you need to remove the `--rm` and pass the `-d` flag. If you want to it restart on reboot or failure, you can pass the flag
-`--restart=unless-stopped`. 
+`--restart=unless-stopped`.
 
 [Read more on the `docker run` command.](https://docs.docker.com/engine/reference/run/)
 
@@ -292,7 +294,7 @@ You should get a JSON response message after a few seconds. If everything went w
 {"status":"OK","message":"Connection","payload":{"ssid":"straylight-g","state":"COMPLETED","ip":"","message":""}}
 ```
 
-You can get the status at any time with the following call to the **status** endpoint. Here is an example:
+You can get the WLAN status at any time with the following call to the **status** endpoint. Here is an example:
 
 ```bash
 # get the wifi status
@@ -303,6 +305,19 @@ Sample return JSON:
 
 ```json
 {"status":"OK","message":"status","payload":{"address":"b7:26:ab:fa:c9:a4","bssid":"50:3b:cb:c8:d3:cd","freq":"2437","group_cipher":"CCMP","id":"0","ip_address":"192.168.86.116","key_mgmt":"WPA2-PSK","mode":"station","p2p_device_address":"fa:27:eb:fe:c9:ab","pairwise_cipher":"CCMP","ssid":"straylight-g","uuid":"a736659a-ae85-5e03-9754-dd808ea0d7f2","wpa_state":"COMPLETED"}}
+```
+
+You can get the AP status at any time with the following call to the **ap** endpoint. Here is an example:
+
+```bash
+# get the ap status
+$ curl -w "\n" http://localhost:8080/ap
+```
+
+Sample return JSON:
+
+```json
+{"status":"OK","message":"status","payload":{"beacon_int":"100","bss":"uap0","bssid":"dc:a6:32:62:4b:0e","cac_time_left_seconds":"N/A","cac_time_seconds":"0","channel":"6","clients":[],"dtim_period":"2","freq":"2437","ht_op_mode":"0x0","ieee80211ac":"0","ieee80211ax":"0","ieee80211n":"0","max_txpower":"30","num_sta":"0","num_sta_ht40_intolerant":"0","num_sta_ht_20_mhz":"0","num_sta_ht_no_gf":"0","num_sta_no_ht":"0","num_sta_no_short_preamble":"0","num_sta_no_short_slot_time":"0","num_sta_non_erp":"0","olbc":"0","olbc_ht":"0","phy":"phy0","secondary_channel":"0","ssid":"your-ssid","state":"ENABLED","supported_rates":"02 04 0b 16 0c 12 18 24 30 48 60 6c"}}
 ```
 
 ### Check the network interface status

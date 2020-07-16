@@ -110,22 +110,28 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 
 	time.Sleep(10 * time.Second)
 
+	// Start supplicant and attempt to connect
 	command.StartWpaSupplicant()
 
-	// Scan
+	// Do a single scan
 	time.Sleep(5 * time.Second)
 	wpacfg.ScanNetworks()
 
 	command.StartDnsmasq()
 
-	// TODO: check to see if we are stuck in a scanning state before
-	// if in a scanning state set a timeout before resetting
+	// monitor for a future connection - shut down AP when it occurs
 	go func() {
 		for {
-			wpacfg.ScanNetworks()
 			time.Sleep(30 * time.Second)
+			if status, err := wpacfg.Status(); err == nil && status["wpa_state"] == "COMPLETED" {
+				log.Info("Connection detected - stopping AP...")
+				time.Sleep(5 * time.Second)
+				command.DisableAp()
+				break
+			}
 		}
 	}()
+
 
 	// staticFields for logger
 	staticFields := make(map[string]interface{})

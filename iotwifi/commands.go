@@ -47,6 +47,20 @@ func (c *Command) CheckApInterface() {
 	go c.Runner.ProcessCmd("ifconfig_uap0", cmd)
 }
 
+// EnableAp enables the AP interface.
+func (c *Command) EnableAp() {
+	cmd := exec.Command("hostapd_cli", "-i", "uap0", "enable")
+	cmd.Start()
+	cmd.Wait()
+}
+
+// DisableAp disables the AP interface.
+func (c *Command) DisableAp() {
+	cmd := exec.Command("hostapd_cli", "-i", "uap0", "disable")
+	cmd.Start()
+	cmd.Wait()
+}
+
 // StartWpaSupplicant starts wpa_supplicant.
 func (c *Command) StartWpaSupplicant() {
 

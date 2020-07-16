@@ -93,6 +93,8 @@ func (wpa *WpaCfg) StartAP() {
 ssid=` + wpa.WpaCfg.HostApdCfg.Ssid + `
 hw_mode=g
 channel=` + wpa.WpaCfg.HostApdCfg.Channel + `
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
 macaddr_acl=0
 auth_algs=1
 ignore_broadcast_ssid=0
@@ -114,15 +116,49 @@ rsn_pairwise=CCMP`
 			wpa.Log.Info("Hostapd DISABLED")
 			//cmd.Process.Kill()
 			//cmd.Wait()
-
 			return
-
 		}
 		if strings.Contains(out, "uap0: AP-ENABLED") {
 			wpa.Log.Info("Hostapd ENABLED")
 			return
 		}
 	}
+}
+
+// Status returns the AP status.
+func (wpa *WpaCfg) APStatus() (map[string]interface{}, error) {
+	cfgMap := make(map[string]interface{}, 0)
+
+	// get the standard stats
+	stateOut, err := exec.Command("hostapd_cli", "-i", "uap0", "status").Output()
+	if err != nil {
+		wpa.Log.Fatal("Got error checking state: %s", err.Error())
+		return cfgMap, err
+	}
+
+	// Remove the indexing associated with ssid, bssid, and bss
+	stateOut = bytes.ReplaceAll(stateOut, []byte("[0]"), []byte(""))
+
+	// Parse and convert to interface map
+	for key, val := range cfgMapper(stateOut){cfgMap[key] = val}
+
+	// get the list of connected clients
+	clientsOut, err := exec.Command("hostapd_cli", "-i", "uap0", "list_sta").Output()
+	if err != nil {
+		wpa.Log.Fatal("Got error checking clients: %s", err.Error())
+		return cfgMap, err
+	}
+
+	clients := []string{};
+	lines := strings.Split(string(clientsOut), "\n")
+	for _, line := range lines {
+		if len(line) > 1 {
+			clients = append(clients, string(line))
+		}
+	}
+	cfgMap["clients"] = clients
+
+	return cfgMap, nil
 }
 
 // ConfiguredNetworks returns a list of configured wifi networks.
@@ -233,7 +269,7 @@ func (wpa *WpaCfg) Status() (map[string]string, error) {
 	return cfgMap, nil
 }
 
-// cfgMapper takes a byte array and splits by \n and then by = and puts it all in a map.
+// cfgMapper handle wpa_cli and hostapd_cli results, takes a byte array and splits by \n and then by = and puts it all in a map.
 func cfgMapper(data []byte) map[string]string {
 	cfgMap := make(map[string]string, 0)
 
