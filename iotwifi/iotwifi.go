@@ -106,7 +106,13 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	})
 
 	wpacfg := NewWpaCfg(log, cfgLocation)
-	wpacfg.StartAP()
+
+	// bring up soft AP
+	command.RemoveApInterface()
+	command.AddApInterface()
+	command.UpApInterface()
+	command.ConfigureApInterface()
+	command.StartHostapd(wpacfg.WpaCfg.HostApdCfg.Ssid, wpacfg.WpaCfg.HostApdCfg.Channel, wpacfg.WpaCfg.HostApdCfg.WpaPassphrase)
 
 	time.Sleep(10 * time.Second)
 
@@ -131,7 +137,6 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 			}
 		}
 	}()
-
 
 	// staticFields for logger
 	staticFields := make(map[string]interface{})
