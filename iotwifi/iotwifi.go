@@ -112,7 +112,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 	command.AddApInterface()
 	command.UpApInterface()
 	command.ConfigureApInterface()
-	command.StartHostapd(wpacfg.WpaCfg.HostApdCfg.Ssid, wpacfg.WpaCfg.HostApdCfg.Channel, wpacfg.WpaCfg.HostApdCfg.WpaPassphrase)
+	command.StartHostapd(wpacfg.WpaCfg.HostApdCfg.Ssid, wpacfg.WpaCfg.HostApdCfg.WpaPassphrase, wpacfg.WpaCfg.HostApdCfg.Channel)
 
 	time.Sleep(10 * time.Second)
 
