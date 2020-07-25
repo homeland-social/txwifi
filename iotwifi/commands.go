@@ -66,7 +66,6 @@ func (c *Command) DisableAp() {
 func (c *Command) StartWpaSupplicant() {
 
 	args := []string{
-		"-d",
 		"-Dnl80211",
 		"-iwlan0",
 		"-c" + c.SetupCfg.WpaSupplicantCfg.CfgFile,
@@ -98,7 +97,6 @@ func (c *Command) StartDnsmasq() {
 // StartHostapd starts hostapd.
 func (c *Command) StartHostapd(ssid string, psk string, channel string) {
 	args := []string{
-		"-d", // enable debug
 		"/dev/stdin",
 	}
 	cmd := exec.Command("hostapd", args...)
