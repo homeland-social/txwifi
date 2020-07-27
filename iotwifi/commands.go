@@ -120,10 +120,9 @@ rsn_pairwise=CCMP`
 
 	// handle in pipe here to pass cfg, out/error handled by Runner
 	hostapdPipe, _ := cmd.StdinPipe()
+	defer hostapdPipe.Close()
 	hostapdPipe.Write([]byte(cfg))
 
 	go c.Runner.ProcessCmd("hostapd", cmd)
-
-	time.Sleep(2)
-	hostapdPipe.Close()
+	time.Sleep(2)	// brief delay before closing pipe
 }
