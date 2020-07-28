@@ -2,6 +2,7 @@ package iotwifi
 
 import (
 	"os/exec"
+	"time"
 
 	"github.com/bhoriuchi/go-bunyan/bunyan"
 )
@@ -65,7 +66,6 @@ func (c *Command) DisableAp() {
 func (c *Command) StartWpaSupplicant() {
 
 	args := []string{
-		"-d",
 		"-Dnl80211",
 		"-iwlan0",
 		"-c" + c.SetupCfg.WpaSupplicantCfg.CfgFile,
@@ -92,4 +92,37 @@ func (c *Command) StartDnsmasq() {
 
 	cmd := exec.Command("dnsmasq", args...)
 	go c.Runner.ProcessCmd("dnsmasq", cmd)
+}
+
+// StartHostapd starts hostapd.
+func (c *Command) StartHostapd(ssid string, psk string, channel string) {
+	args := []string{
+		"/dev/stdin",
+	}
+	cmd := exec.Command("hostapd", args...)
+
+	cfg := `interface=uap0
+ssid=` + ssid + `
+hw_mode=g
+channel=` + channel + `
+ctrl_interface=/var/run/hostapd
+ctrl_interface_group=0
+macaddr_acl=0
+auth_algs=1
+ignore_broadcast_ssid=0
+wpa=2
+wpa_passphrase=` + psk + `
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=TKIP
+rsn_pairwise=CCMP`
+
+	c.Log.Info("Hostapd CFG: %s", cfg)
+
+	// handle in pipe here to pass cfg, out/error handled by Runner
+	hostapdPipe, _ := cmd.StdinPipe()
+	defer hostapdPipe.Close()
+	hostapdPipe.Write([]byte(cfg))
+
+	go c.Runner.ProcessCmd("hostapd", cmd)
+	time.Sleep(2)	// brief delay before closing pipe
 }
