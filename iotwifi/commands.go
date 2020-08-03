@@ -81,6 +81,7 @@ func (c *Command) StartDnsmasq() {
 	args := []string{
 		"--no-hosts", // Don't read the hostnames in /etc/hosts.
 		"--keep-in-foreground",
+		"--interface=uap0",
 		"--log-queries",
 		"--no-resolv",
 		"--address=" + c.SetupCfg.DnsmasqCfg.Address,

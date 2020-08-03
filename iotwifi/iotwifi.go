@@ -152,7 +152,7 @@ func RunWifi(log bunyan.Logger, messages chan CmdMessage, cfgLocation string) {
 				break
 			}
 
-			time.Sleep(120 * time.Second)
+			time.Sleep(30 * time.Second)
 		}
 	}()
 
