@@ -1,14 +1,14 @@
-FROM arm32v7/golang:1.13-alpine3.11 AS builder
+FROM golang:1.21-alpine3.18 AS builder
 
 ENV GOPATH /go
-WORKDIR /go/src
 
-RUN mkdir -p /go/src/github.com/kinokochat/txwifi
-COPY . /go/src/github.com/kinokochat/txwifi
+RUN mkdir -p /go/src/github.com/homeland-social/txwifi
+COPY . /go/src/github.com/homeland-social/txwifi
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/wifi-server /go/src/github.com/kinokochat/txwifi/main.go
+WORKDIR /go/src/github.com/homeland-social/txwifi
+RUN CGO_ENABLED=0 GOOS=linux go build -o /go/bin/wifi-server main.go
 
-FROM arm32v7/alpine:3.11
+FROM alpine:3.18
 
 RUN apk update
 RUN apk add bridge hostapd wireless-tools wpa_supplicant dnsmasq iw ethtool
