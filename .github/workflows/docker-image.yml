@@ -29,7 +29,7 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: build and push console
+      - name: build and push txwifi
         run: |
           docker buildx build \
             --push \
@@ -43,4 +43,4 @@ jobs:
           readme-filepath: ./README.md
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ secrets.DOCKER_ORG }}/console
+          repository: ${{ secrets.DOCKER_ORG }}/txwifi
