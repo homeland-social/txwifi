@@ -31,7 +31,7 @@ jobs:
 
       - name: build and push console
         run: |
-          docker buildx build . \
+          docker buildx build \
             --push \
             --tag ${{secrets.DOCKER_ORG}}/txwifi:latest \
             --tag ${{secrets.DOCKER_ORG}}/txwifi:${{env.tag}} \
